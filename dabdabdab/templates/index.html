@@ -1,12 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta http-equiv="refresh" content="5" />
     <title>dabdabdab dashboard</title>
+    <style>
+      .status_up {
+        color: green;
+        font-weight: bold;
+      }
+      .status_down {
+        color: red;
+        font-weight: bold;
+      }
+    </style>
   </head>
   <body>
     {% for worker in workers %}
     <div>
-      <h2>Worker {{ worker.id }}</h2>
+      <h2>{{ worker.id }}</h2>
 
       {% if worker.is_up %}
       <p>Status: <span class="status_up">UP</span></p>
@@ -14,7 +25,6 @@
       <p>Status: <span class="status_down">DOWN</span></p>
       {% endif %}
 
-      <p>Latest results:</p>
       <ul>
         {% for result in worker.results %}
         <li>{{ result.text }} ({{ result.time }})</li>

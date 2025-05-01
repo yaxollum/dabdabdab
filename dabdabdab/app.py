@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import time
+import datetime
 
 from flask import Flask, request, render_template
 
@@ -12,7 +13,31 @@ DABDAB_DB = os.getenv("DABDAB_DB")
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    with sqlite3.connect(DABDAB_DB) as conn:
+        worker_ids = [
+            x[0]
+            for x in conn.execute("SELECT DISTINCT worker_id FROM results").fetchall()
+        ]
+        workers = []
+        for worker_id in worker_ids:
+            results = conn.execute(
+                "SELECT result,time from results WHERE worker_id=? ORDER BY time DESC LIMIT 5",
+                (worker_id,),
+            ).fetchall()
+            workers.append(
+                {
+                    "id": worker_id,
+                    "is_up": time.time() - results[0][1] < 10,
+                    "results": [
+                        {
+                            "text": r[0],
+                            "time": datetime.datetime.fromtimestamp(r[1]).isoformat(),
+                        }
+                        for r in results
+                    ],
+                }
+            )
+    return render_template("index.html", workers=workers)
 
 
 def log_result(worker_id, result):
