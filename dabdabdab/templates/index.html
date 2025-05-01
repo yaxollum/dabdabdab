@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>dabdabdab dashboard</title>
+  </head>
+  <body>
+    {% for worker in workers %}
+    <div>
+      <h2>Worker {{ worker.id }}</h2>
+
+      {% if worker.is_up %}
+      <p>Status: <span class="status_up">UP</span></p>
+      {% else %}
+      <p>Status: <span class="status_down">DOWN</span></p>
+      {% endif %}
+
+      <p>Latest results:</p>
+      <ul>
+        {% for result in worker.results %}
+        <li>{{ result.text }} ({{ result.time }})</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </body>
+</html>
