@@ -1,3 +1,4 @@
+use rand::prelude::*;
 use sha2::{Digest, Sha256};
 use std::env;
 use std::io;
@@ -30,27 +31,34 @@ fn is_dab(buff: &[u8]) -> bool {
 
 fn post_result(worker_id: &str, result: &str) {
     let form = [("worker_id", worker_id), ("result", result)];
-    ureq::post("http://localhost:6969/results")
-        .send_form(form)
-        .expect("Error POSTing result");
+    loop {
+        match ureq::post("http://localhost:6969/results").send_form(form) {
+            Ok(_) => return,
+            Err(e) => eprintln!("Error POSTing {:?}: {}", form, e),
+        }
+        // Retry after 10 seconds
+        std::thread::sleep(std::time::Duration::from_secs(10));
+    }
 }
 
 fn main() {
+    let mut rng = rand::rng();
     let args: Vec<String> = env::args().collect();
-    if args.len() != 3 {
-        eprintln!("usage: {} <worker id> <initial N>", args[0]);
+    if args.len() != 2 {
+        eprintln!("usage: {} <worker id prefix>", args[0]);
         exit(1);
     }
-    let worker_id = &args[1];
-    let starting_n = args[2].parse::<i64>().expect("Failed to parse starting N.");
+    let worker_id_prefix = &args[1];
+    let starting_n: i64 = rng.random_range(0..10i64.pow(17));
+    let worker_id = format!("{}-{}", worker_id_prefix, starting_n / 10i64.pow(11));
     for n in starting_n.. {
         if n % 1000000 == 0 {
-            post_result(worker_id, &format!("{}", n))
+            post_result(&worker_id, &format!("{}", n))
         }
         let str = get_buff(n);
         if is_dab(&str) {
             post_result(
-                worker_id,
+                &worker_id,
                 &format!("{}\n{:?}", n, String::from_utf8(str).unwrap()),
             );
             return;
