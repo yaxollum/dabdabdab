@@ -16,11 +16,14 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
         padding: 20px;
+      }
+      body {
         font-family: sans-serif;
       }
     </style>
   </head>
   <body>
+    <h1>Total results: {{ total_results }}</h1>
     <div id="main-container">
       {% for worker in workers %}
       <div>

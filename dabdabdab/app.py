@@ -37,7 +37,8 @@ def index():
                     ],
                 }
             )
-    return render_template("index.html", workers=workers)
+        total_results = conn.execute("SELECT COUNT(*) FROM results").fetchone()[0]
+    return render_template("index.html", total_results=total_results, workers=workers)
 
 
 def log_result(worker_id, result):
