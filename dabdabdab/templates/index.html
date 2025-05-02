@@ -12,25 +12,33 @@
         color: red;
         font-weight: bold;
       }
+      #main-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        padding: 20px;
+        font-family: sans-serif;
+      }
     </style>
   </head>
   <body>
-    {% for worker in workers %}
-    <div>
-      <h2>{{ worker.id }}</h2>
+    <div id="main-container">
+      {% for worker in workers %}
+      <div>
+        <h2>{{ worker.id }}</h2>
 
-      {% if worker.is_up %}
-      <p>Status: <span class="status_up">UP</span></p>
-      {% else %}
-      <p>Status: <span class="status_down">DOWN</span></p>
-      {% endif %}
+        {% if worker.is_up %}
+        <p>Status: <span class="status_up">UP</span></p>
+        {% else %}
+        <p>Status: <span class="status_down">DOWN</span></p>
+        {% endif %}
 
-      <ul>
-        {% for result in worker.results %}
-        <li>{{ result.text }} ({{ result.time }})</li>
-        {% endfor %}
-      </ul>
+        <ul>
+          {% for result in worker.results %}
+          <li>{{ result.text }} ({{ result.time }})</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
     </div>
-    {% endfor %}
   </body>
 </html>
